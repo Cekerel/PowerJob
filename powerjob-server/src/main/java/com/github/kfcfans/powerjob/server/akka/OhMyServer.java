@@ -55,10 +55,14 @@ public class OhMyServer {
         actorSystemAddress = localIP + ":" + port;
         log.info("[OhMyWorker] akka-remote server address: {}", actorSystemAddress);
 
+        // ConfigFactory.load用来加载指定路径下的配置文件
         Config akkaBasicConfig = ConfigFactory.load(RemoteConstant.SERVER_AKKA_CONFIG_NAME);
-        Config akkaFinalConfig = ConfigFactory.parseMap(overrideConfig).withFallback(akkaBasicConfig);
-        actorSystem = ActorSystem.create(RemoteConstant.SERVER_ACTOR_SYSTEM_NAME, akkaFinalConfig);
 
+        //将代码中获取到的配置overrideConfig与配置文件中地基础配置合并成最终的AKKA配置
+        Config akkaFinalConfig = ConfigFactory.parseMap(overrideConfig).withFallback(akkaBasicConfig);
+
+
+        actorSystem = ActorSystem.create(RemoteConstant.SERVER_ACTOR_SYSTEM_NAME, akkaFinalConfig);
         actorSystem.actorOf(Props.create(ServerActor.class)
                 .withDispatcher("akka.server-actor-dispatcher")
                 .withRouter(new RoundRobinPool(Runtime.getRuntime().availableProcessors() * 4)), RemoteConstant.SERVER_ACTOR_NAME);
@@ -81,11 +85,21 @@ public class OhMyServer {
         return actorSystem.actorSelection(path);
     }
 
+    /**
+     *  获取TaskTrackActor 的 ActorSelection
+     * @param address IP:port
+     * @return ActorSelection
+     */
     public static ActorSelection getTaskTrackerActor(String address) {
         String path = String.format(AKKA_PATH, RemoteConstant.WORKER_ACTOR_SYSTEM_NAME, address, RemoteConstant.Task_TRACKER_ACTOR_NAME);
         return actorSystem.actorSelection(path);
     }
 
+    /**
+     *  获取WorkerActor 的 ActorSelection
+     * @param address IP:port
+     * @return  ActorSelection
+     */
     public static ActorSelection getWorkerActor(String address) {
         String path = String.format(AKKA_PATH, RemoteConstant.WORKER_ACTOR_SYSTEM_NAME, address, RemoteConstant.WORKER_ACTOR_NAME);
         return actorSystem.actorSelection(path);

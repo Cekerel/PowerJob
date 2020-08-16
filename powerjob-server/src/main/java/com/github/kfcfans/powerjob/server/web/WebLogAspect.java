@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -42,6 +43,13 @@ public class WebLogAspect {
     public void include() {
     }
 
+    /**
+     *  定义切入点
+     *  第一个*: 标识所有返回类型
+     *  字母路径: 指定的类方法
+     *  第二个*: 所有的方法
+     *  最后的两个点: 所有类型的参数
+     */
     @Pointcut("execution(public * com.github.kfcfans.powerjob.server.web.controller.ServerController.*(..))")
     public void exclude() {
     }
@@ -60,14 +68,17 @@ public class WebLogAspect {
             }
             HttpServletRequest request = requestAttributes.getRequest();
 
+            log.info(joinPoint.toLongString());
             String[] classNameSplit = joinPoint.getSignature().getDeclaringTypeName().split("\\.");
+            // 将类的完整路径中的package名称部分去除, 获取类的实际名称
             String classNameMini = classNameSplit[classNameSplit.length - 1];
             String classMethod = classNameMini + "." + joinPoint.getSignature().getName();
 
             // 排除特殊类
 
             // 192.168.1.1|POST|com.xxx.xxx.save|请求参数
-            log.info("{}|{}|{}|{}", request.getRemoteAddr(), request.getMethod(), classMethod, stringify(joinPoint.getArgs()));
+            log.info("{} | {} | {} | {}", request.getRemoteAddr(),
+                    request.getMethod(), classMethod, stringify(joinPoint.getArgs()));
         }catch (Exception e) {
             // just for safe
             log.error("[WebLogAspect] aop occur exception, please concat @KFCFans to fix the bug!", e);

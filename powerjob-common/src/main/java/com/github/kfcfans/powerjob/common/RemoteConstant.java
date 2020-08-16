@@ -28,6 +28,8 @@ public class RemoteConstant {
     public static final String SERVER_ACTOR_NAME = "server_actor";
     public static final String SERVER_FRIEND_ACTOR_NAME = "friend_actor";
     public static final String SERVER_TROUBLESHOOTING_ACTOR_NAME = "server_troubleshooting_actor";
+
+    // 此处字段对应项目中resources目录下的AKKA配置文件名称
     public static final String SERVER_AKKA_CONFIG_NAME = "oms-server.akka.conf";
 
 
